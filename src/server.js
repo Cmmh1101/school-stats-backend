@@ -36,11 +36,11 @@ app.use(
 app.post("/api/articles/:name/upvote", (req, res) => {
   const articleName = req.params.name;
 
-  articlesInfo[articleName].upvotes + -1;
+  articlesInfo[articleName].upvotes += 1;
   res
     .status(200)
     .send(
-      `${articleName} now has ${articlesInfo[articleName].upvotes} upvotes`
+      `${articleName} now has ${articlesInfo[articleName].upvotes} upvotes!`
     );
 });
 
