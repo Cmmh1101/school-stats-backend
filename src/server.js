@@ -39,6 +39,9 @@ app.get("/internet", async (req, res) => {
         avgGrade: { $avg: "$G3" },
       },
     },
+    {
+      $sort: { _id: 1 },
+    },
   ]);
 
   //   { labels: Array, values: Array }
@@ -72,6 +75,9 @@ app.get("/traveltime", async (req, res) => {
         avgGrade: { $avg: "$G3" },
       },
     },
+    {
+      $sort: { _id: 1 },
+    },
   ]);
 
   //   { labels: Array, values: Array }
@@ -103,6 +109,9 @@ app.get("/health", async (req, res) => {
         avgGrade: { $avg: "$G1" },
       },
     },
+    {
+      $sort: { _id: 1 },
+    },
   ]);
   const healthStats2 = await dataCollection.aggregate([
     {
@@ -111,6 +120,9 @@ app.get("/health", async (req, res) => {
         avgGrade: { $avg: "$G2" },
       },
     },
+    {
+      $sort: { _id: 1 },
+    },
   ]);
   const healthStats3 = await dataCollection.aggregate([
     {
@@ -118,6 +130,9 @@ app.get("/health", async (req, res) => {
         _id: "$health",
         avgGrade: { $avg: "$G3" },
       },
+    },
+    {
+      $sort: { _id: 1 },
     },
   ]);
 
@@ -153,14 +168,14 @@ app.get("/health", async (req, res) => {
   });
 });
 
-app.get("/famsup", async (req, res) => {
+app.get("/famschoolsup", async (req, res) => {
   const mongoClient = await MongoClient.connect(MONGO_URI, {
     useNewUrlParser: true,
   });
   const db = await mongoClient.db("src");
   const dataCollection = await db.collection("data");
 
-  const stats = await dataCollection.aggregate([
+  const statsFamSup = await dataCollection.aggregate([
     {
       $group: {
         _id: "$famsup",
@@ -168,34 +183,43 @@ app.get("/famsup", async (req, res) => {
       },
     },
     {
+      $sort: { _id: 1 },
+    },
+  ]);
+
+  const statsSchoolSup = await dataCollection.aggregate([
+    {
       $group: {
         _id: "$schoolsup",
         avgGrade: { $avg: "$G3" },
       },
     },
+    {
+      $sort: { _id: 1 },
+    },
   ]);
 
   //   { labels: Array, values: Array }
-  const labels = [];
-  const values = [];
-  const labelSchoolSup = [];
-  const valueSchoolSup = [];
+  const labelsFamSup = [];
+  const valuesFamSup = [];
+  const labelsSchoolSup = [];
+  const valuesSchoolSup = [];
 
-  await stats.forEach((stat) => {
-    labels.push(stat._id);
-    values.push(stat.avgGrade);
+  await statsFamSup.forEach((stat) => {
+    labelsFamSup.push(stat._id);
+    valuesFamSup.push(stat.avgGrade);
   });
-  await stats.forEach((stat) => {
-    labelSchoolSup.push(stat._id);
-    valueSchoolSup.push(stat.avgGrade);
+  await statsSchoolSup.forEach((stat) => {
+    labelsSchoolSup.push(stat._id);
+    valuesSchoolSup.push(stat.avgGrade);
   });
 
   //   res.send(await stats.toArray());
   res.json({
-    labels,
-    values,
-    labelSchoolSup,
-    valueSchoolSup,
+    labelsFamSup,
+    valuesFamSup,
+    labelsSchoolSup,
+    valuesSchoolSup,
   });
 });
 
