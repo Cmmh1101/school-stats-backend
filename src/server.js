@@ -14,27 +14,6 @@ app.use(
   })
 );
 
-// new app use
-
-// app.use("/internet", internetChartRouter);
-
-// query data
-
-// get route
-// app.get("/", (req, res) => {
-//   db.getSiblingDB("src");
-//   db.getCollection("data").find({});
-//   db.collection.count();
-
-//   res.status(200);
-//   res.json(data);
-
-//   const client = await MongoClient.connect("mongodb://localhost:27017", {
-//     useNewUrlParser: true,
-//   });
-//   const db = clientdb("");
-// });
-
 const MONGO_URL = "mongodb://76.107.181.181/32";
 const MONGO_PASS = "RodolfoJ08-";
 const MONGO_URI = `mongodb+srv://mydbuser:${MONGO_PASS}@cluster0.ab4he.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -44,37 +23,6 @@ const MONGO_URI = `mongodb+srv://mydbuser:${MONGO_PASS}@cluster0.ab4he.mongodb.n
   });
   const db = await mongoClient.db("src");
   const dataCollection = await db.collection("data");
-
-  //   guia para conseguir un doc
-
-  //   const foo = await dataCollection.findOne({
-  //     G3: 10,
-  //   });
-
-  const fooz = await dataCollection.aggregate([
-    {
-      $group: {
-        _id: "$internet",
-        avgGrade: { $avg: "$G3" },
-      },
-    },
-  ]);
-
-  //   console.log("resultado: ", fooz);
-  //   fooz.forEach(console.log);
-
-  //   throw Error();
-
-  const internetYes = await dataCollection.find();
-  //   console.log(await dataCollection.count);
-  //   console.log(await internetYes.count());
-  //   var totalInternet = 0;
-  //   await internetYes.forEach((student) => {
-  //     if (student.internet == "yes") {
-  //       totalInternet++;
-  //     }
-  //   });
-  //   console.log(`${totalInternet} students have internet`);
 })();
 
 app.get("/internet", async (req, res) => {
@@ -93,16 +41,10 @@ app.get("/internet", async (req, res) => {
     },
   ]);
 
-  // que necesita el frontend?
-  // 1. data: Array[Number]
-  // 2. labels: Array[String]
-
   //   { labels: Array, values: Array }
   const labels = [];
   const values = [];
 
-  //[_id, 'no', avgGrade: '9']
-  //[_id, 'yes', avgGrade: '10']
   await stats.forEach((stat) => {
     labels.push(stat._id);
     values.push(stat.avgGrade);
@@ -132,16 +74,10 @@ app.get("/traveltime", async (req, res) => {
     },
   ]);
 
-  // que necesita el frontend?
-  // 1. data: Array[Number]
-  // 2. labels: Array[String]
-
   //   { labels: Array, values: Array }
   const labels = [];
   const values = [];
 
-  //[_id, 'no', avgGrade: '9']
-  //[_id, 'yes', avgGrade: '10']
   await stats.forEach((stat) => {
     labels.push(stat._id);
     values.push(stat.avgGrade);
@@ -185,10 +121,6 @@ app.get("/health", async (req, res) => {
     },
   ]);
 
-  // que necesita el frontend?
-  // 1. data: Array[Number]
-  // 2. labels: Array[String]
-
   //   { labels: Array, values: Array }
   const labels = [];
   const values = [];
@@ -197,8 +129,6 @@ app.get("/health", async (req, res) => {
   const labels3 = [];
   const values3 = [];
 
-  //[_id, 'no', avgGrade: '9']
-  //[_id, 'yes', avgGrade: '10']
   await healthStats.forEach((stat) => {
     labels.push(stat._id);
     values.push(stat.avgGrade);
@@ -220,6 +150,52 @@ app.get("/health", async (req, res) => {
     values2,
     labels3,
     values3,
+  });
+});
+
+app.get("/famsup", async (req, res) => {
+  const mongoClient = await MongoClient.connect(MONGO_URI, {
+    useNewUrlParser: true,
+  });
+  const db = await mongoClient.db("src");
+  const dataCollection = await db.collection("data");
+
+  const stats = await dataCollection.aggregate([
+    {
+      $group: {
+        _id: "$famsup",
+        avgGrade: { $avg: "$G3" },
+      },
+    },
+    {
+      $group: {
+        _id: "$schoolsup",
+        avgGrade: { $avg: "$G3" },
+      },
+    },
+  ]);
+
+  //   { labels: Array, values: Array }
+  const labels = [];
+  const values = [];
+  const labelSchoolSup = [];
+  const valueSchoolSup = [];
+
+  await stats.forEach((stat) => {
+    labels.push(stat._id);
+    values.push(stat.avgGrade);
+  });
+  await stats.forEach((stat) => {
+    labelSchoolSup.push(stat._id);
+    valueSchoolSup.push(stat.avgGrade);
+  });
+
+  //   res.send(await stats.toArray());
+  res.json({
+    labels,
+    values,
+    labelSchoolSup,
+    valueSchoolSup,
   });
 });
 
